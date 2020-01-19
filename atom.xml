@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[My Octopress Blog]]></title>
+  <link href="http://darren1231.github.io/atom.xml" rel="self"/>
+  <link href="http://darren1231.github.io/"/>
+  <updated>2020-01-19T22:02:40+08:00</updated>
+  <id>http://darren1231.github.io/</id>
+  <author>
+    <name><![CDATA[Your Name]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[This Is the Title]]></title>
+    <link href="http://darren1231.github.io/blog/2020/01/19/this-is-the-title/"/>
+    <updated>2020-01-19T22:02:26+08:00</updated>
+    <id>http://darren1231.github.io/blog/2020/01/19/this-is-the-title</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
+  
+</feed>
