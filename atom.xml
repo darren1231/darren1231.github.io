@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://darren1231.github.io/atom.xml" rel="self"/>
   <link href="http://darren1231.github.io/"/>
-  <updated>2020-01-19T22:07:38+08:00</updated>
+  <updated>2020-01-21T23:48:37+08:00</updated>
   <id>http://darren1231.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -18,7 +18,19 @@
     <link href="http://darren1231.github.io/blog/2020/01/19/this-is-the-title/"/>
     <updated>2020-01-19T22:02:26+08:00</updated>
     <id>http://darren1231.github.io/blog/2020/01/19/this-is-the-title</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<h1>架網站教學</h1>
+
+<h2>install ruby</h2>
+
+<p><a href="https://rubyinstaller.org/downloads/">https://rubyinstaller.org/downloads/</a>
+<img src="https://i.imgur.com/dOemCjE.png" alt="" /></p>
+
+<p><img src="https://i.imgur.com/TTvo9Ca.png" alt="" /></p>
+
+<p><img src="https://i.imgur.com/FbbjzKG.png" alt="" /></p>
+
+<p><a href="https://mgleon08.github.io/blog/2015/12/11/how-to-install-octopress/">https://mgleon08.github.io/blog/2015/12/11/how-to-install-octopress/</a>
+<a href="https://zerodie.github.io/blog/2012/01/19/octopress-github-pages/">https://zerodie.github.io/blog/2012/01/19/octopress-github-pages/</a></p>
 ]]></content>
   </entry>
   
