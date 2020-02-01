@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://darren1231.github.io/atom.xml" rel="self"/>
   <link href="http://darren1231.github.io/"/>
-  <updated>2020-01-23T00:44:16+08:00</updated>
+  <updated>2020-02-01T14:49:25+08:00</updated>
   <id>http://darren1231.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -18,9 +18,7 @@
     <link href="http://darren1231.github.io/blog/2020/01/19/this-is-the-title/"/>
     <updated>2020-01-19T22:02:26+08:00</updated>
     <id>http://darren1231.github.io/blog/2020/01/19/this-is-the-title</id>
-    <content type="html"><![CDATA[<p>$z^0:$把X映射到非C集合中</p>
-
-<h2 id="section">一.前言</h2>
+    <content type="html"><![CDATA[<h2 id="section">一.前言</h2>
 <p>小編之前一直都是使用匹克幫這種簡單的網站，不用費太多心力，直接剪剪貼貼就可以將圖片以及想要的資訊分享給大家，但使用一段時間後覺得匹克邦的網頁簡潔度、美觀都不如我長期使用的Markdown好用，常常Markdown寫完一篇文章後還要再花費心力整理到匹克幫然後做排版的動作，實在很費功夫，因此決定換個方式架設我的網站，搜尋了一下後發現竟然有可以使用github當成架設網站伺服器的方法，經過幾番摸索後終於架設成功了，底下就紀錄架設順序方便以後複習。
 ## 二.安裝步驟
 底下介紹安裝的方法，首先要安裝
