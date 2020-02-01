@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://darren1231.github.io/atom.xml" rel="self"/>
   <link href="http://darren1231.github.io/"/>
-  <updated>2020-02-01T15:24:29+08:00</updated>
+  <updated>2020-02-01T15:28:01+08:00</updated>
   <id>http://darren1231.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -111,7 +111,8 @@
 </ul>
 <figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class=""><span class="line">rake preview</span></code></pre></td></tr></table></div></figure>
-<p>### f.push 到github上</p>
+
+<h3 id="fpush-github">f.push 到github上</h3>
 
 <figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
