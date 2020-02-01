@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>My Octopress Blog</title>
+  <title>類神經網路筆記 - My Octopress Blog</title>
   <meta name="author" content="Your Name">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://darren1231.github.io/">
+  <link rel="canonical" href="http://darren1231.github.io/blog/2020/02/01/backpropagation/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
@@ -78,15 +78,12 @@ MathJax.Hub.Config({
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2020/02/01/backpropagation/">類神經網路筆記</a></h1>
+      <h1 class="entry-title">類神經網路筆記</h1>
     
     
       <p class="meta">
@@ -97,15 +94,15 @@ MathJax.Hub.Config({
 
 <time class='entry-date' datetime='2020-02-01T15:51:57+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2020</span></span> <span class='time'>3:51 pm</span></time>
         
-           | <a href="/blog/2020/02/01/backpropagation/#disqus_thread"
-             data-disqus-identifier="http://darren1231.github.io/blog/2020/02/01/backpropagation/">Comments</a>
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://darren1231.github.io">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2 id="section">一.前言</h2>
+<div class="entry-content"><h2 id="section">一.前言</h2>
 
 <p>小編看了很多的書籍介紹類神經的，發現這本講的最淺顯易懂而且還附有程式碼，我認為電腦科學與其他物理學、電磁學…等最不同的點在於他是可以看出效果的，是感覺的到的，就算不太懂他的數學原理，反覆地去看程式碼再回來對照公式很快就可以更深入的了解，但是類似電磁學那種理論，即使你經由公式算出了電場是多少，電荷是多少，我依然沒有什麼感覺因為他看不到也摸不到，但電腦科學就不同了，你可以經由寫程式透過軟體去驗證你的理論正不正確，下面就帶各位一步一步地進入類神經的科學理論以及用個實際的例子說明這理論要如何使用。</p>
 
@@ -593,265 +590,52 @@ y^{'} = \left\{ \begin{matrix} 1,\ \ \ \ if\ X_{1} + X_{2} > 1.5 \\ 0,\ \ \ if\ 
 
 <p>http://cs231n.github.io/optimization-2/</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2020-02-01T15:51:57+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2020</span></span> <span class='time'>3:51 pm</span></time>
+      
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2020/01/19/this-is-the-title/">在windows系統上用octopress打造自己的部落格</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2020-01-19T22:02:26+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>10:02 pm</span></time>
-        
-           | <a href="/blog/2020/01/19/this-is-the-title/#disqus_thread"
-             data-disqus-identifier="http://darren1231.github.io/blog/2020/01/19/this-is-the-title/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2 id="section">一.前言</h2>
-<p>小編之前一直都是使用匹克幫這種簡單的網站，不用費太多心力，直接剪剪貼貼就可以將圖片以及想要的資訊分享給大家，但使用一段時間後覺得匹克邦的網頁簡潔度、美觀都不如我長期使用的Markdown好用，常常Markdown寫完一篇文章後還要再花費心力整理到匹克幫然後做排版的動作，實在很費功夫，因此決定換個方式架設我的網站，搜尋了一下後發現竟然有可以使用github當成架設網站伺服器的方法，經過幾番摸索後終於架設成功了，底下就紀錄架設順序方便以後複習。</p>
-
-<h2 id="section-1">二.安裝步驟</h2>
-<p>底下介紹安裝的方法，首先要安裝ruby 環境以及gem</p>
-
-<h3 id="aruby">a.安裝Ruby環境</h3>
-
-<ul>
-  <li>官網:<a href="https://rubyinstaller.org/downloads">https://rubyinstaller.org/downloads</a></li>
-</ul>
-
-<p>到上面的官網連結下載</p>
-
-<h4 id="rubyinstaller-233-x64exe">1.rubyinstaller-2.3.3-x64.exe</h4>
-
-<h4 id="devkit-mingw64-64-472-20130224-1432-sfxexe">2.DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe\</h4>
-
-<p>然後點擊安裝rubyinstaller，記得要勾選自動配置環境。</p>
-
-<p><a href="https://i.imgur.com/gnfUvGP.png"></a>
-<img src="https://i.imgur.com/3wDNMZH.png" alt="" /></p>
-
-<p>然後點擊安裝Devkit，選擇完解壓縮的位置後開啟命令提示元移動到安裝的資料夾下輸入以下指令</p>
-
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">ruby dk.rb init 
-</span><span class="line">ruby dk.rb install</span></code></pre></td></tr></table></div></figure>
-
-<p><img src="https://i.imgur.com/8WsFsxQ.png" alt="" /></p>
-
-<h3 id="bgem">b.更新gem</h3>
-<p>安裝完成功後就要輸入以下指令更新gem，可以打gem測試看看有無成功</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem update --system</span></code></pre></td></tr></table></div></figure>
-<p><img src="https://i.imgur.com/UntOmd4.png" alt="" /></p>
-
-<p><a href="https://i.imgur.com/VavS8zg.png"></a></p>
-
-<h3 id="cgitoctopress">c.用git拿到octopress資料</h3>
-<p>執行這步驟前先要確定電腦已經安裝了git，安裝完後打開git bash　輸入以下指令：</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">git clone git://github.com/imathis/octopress.git octopress
-</span><span class="line">cd octopress
-</span><span class="line">gem install bundler
-</span><span class="line">bundle install
-</span><span class="line">rake install
-</span><span class="line">
-</span><span class="line"># gem uninstall rake(if you want to delete rake)</span></code></pre></td></tr></table></div></figure>
-<p><a href="https://i.imgur.com/MULJVjR.png"></a>
-<img src="https://i.imgur.com/pydyfcD.png" alt="" />
-<img src="https://i.imgur.com/xokNqkp.png" alt="" /></p>
-
-<h3 id="dgithub">d.設定github的路徑</h3>
-<p>這裡會將部落格原始碼連結到您的github帳號底下，沒有github帳好的請去申請一個，之後創造一個名稱為username.github.io的repository(注意：這裡要把username換成您的github帳號名稱)
-<img src="https://i.imgur.com/15Xhsl2.png" alt="" /></p>
-
-<p><a href="https://i.imgur.com/we7LvjE.png"></a></p>
-
-<p>之後在git bash視窗下輸入下列程式碼，它會直接跳到下一行等待您輸入github的網域位置</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rake setup_github_pages
-</span><span class="line">git@github.com:darren1231/darren1231.github.io.git</span></code></pre></td></tr></table></div></figure>
-<p><a href="https://i.imgur.com/zQux6dp.png"></a>
-<img src="https://i.imgur.com/sZOQZpX.png" alt="" /></p>
-
-<h3 id="erake">e.接下來就可以運用rake指令管理您的部落格了</h3>
-<ul>
-  <li>建立新文章</li>
-</ul>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rake new_post["this is the title"]</span></code></pre></td></tr></table></div></figure>
-<ul>
-  <li>發佈</li>
-</ul>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rake generate
-</span><span class="line">rake deploy</span></code></pre></td></tr></table></div></figure>
-<ul>
-  <li>預覽
-輸入下列程式碼就可以在本地端觀看網頁(在網址列輸入http://127.0.0.1:4000/)</li>
-</ul>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">rake preview</span></code></pre></td></tr></table></div></figure>
-
-<h3 id="fpush-github">f.push 到github上</h3>
-
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">git add .
-</span><span class="line">git commit -m "first commit"
-</span><span class="line">git push origin source</span></code></pre></td></tr></table></div></figure>
-
-<h2 id="section-2">三.增加額外功能</h2>
-
-<h3 id="adisqus-">a.加入disqus 討論區</h3>
-<p>修改 _config.yml 內的 # Disqus Comments ，填上在 Disqus 申請的 short name ，並改成 true。</p>
-
-<p><img src="https://i.imgur.com/fprLGrc.png" alt="" /></p>
-
-<h3 id="b">b.加入數學公式</h3>
-<ul>
-  <li>1.安裝kramdown</li>
-</ul>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">gem install kramdown</span></code></pre></td></tr></table></div></figure>
-<ul>
-  <li>
-    <p>2.修改_config.yml
-取代所有rdiscount 關鍵字成kramdown</p>
-  </li>
-  <li>
-    <p>3.修改Gemfile
-把gem ‘ridiscount’改成gem ‘kramdown in Gemfile</p>
-  </li>
-  <li>
-    <p>4.添加Mathjax配置</p>
-  </li>
-</ul>
-
-<p>在source/_includes/custom/head.html 添加以下代碼</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">&lt;!-- mathjax config similar to math.stackexchange --&gt;
-</span><span class="line">&lt;script type="text/x-mathjax-config"&gt;
-</span><span class="line">MathJax.Hub.Config({
-</span><span class="line">  jax: ["input/TeX", "output/HTML-CSS"],
-</span><span class="line">  tex2jax: {
-</span><span class="line">    inlineMath: [ ['$', '$'] ],
-</span><span class="line">    displayMath: [ ['$$', '$$']],
-</span><span class="line">    processEscapes: true,
-</span><span class="line">    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-</span><span class="line">  },
-</span><span class="line">  messageStyle: "none",
-</span><span class="line">  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
-</span><span class="line">});
-</span><span class="line">&lt;/script&gt;
-</span><span class="line">&lt;script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"&gt;&lt;/script&gt;</span></code></pre></td></tr></table></div></figure>
-
-<ul>
-  <li>5.修復Mathjax右擊頁面空白bug</li>
-</ul>
-
-<p>修改 sass/base/_theme.scss，並將div 改成 div#main</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">  &gt; div#main {
-</span><span class="line">     background: $sidebar-bg $noise-bg;
-</span><span class="line">     border-bottom: 1px solid $page-border-bottom;
-</span><span class="line">     &gt; div {</span></code></pre></td></tr></table></div></figure>
-<ul>
-  <li>6.測試公式</li>
-</ul>
-
-<p>整段LeTex</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">$$
-</span><span class="line">\begin{align}
-</span><span class="line">\mbox{Union: } &amp; A\cup B = \{x\mid x\in A \mbox{ or } x\in B\} \\
-</span><span class="line">\mbox{Concatenation: } &amp; A\circ B  = \{xy\mid x\in A \mbox{ and } y\in B\} \\
-</span><span class="line">\mbox{Star: } &amp; A^\star  = \{x_1x_2\ldots x_k \mid  k\geq 0 \mbox{ and each } x_i\in A\} \\
-</span><span class="line">\end{align}
-</span><span class="line">$$</span></code></pre></td></tr></table></div></figure>
-<p><script type="math/tex">% <![CDATA[
-\begin{align}
-\mbox{Union: } & A\cup B = \{x\mid x\in A \mbox{ or } x\in B\} \\
-\mbox{Concatenation: } & A\circ B  = \{xy\mid x\in A \mbox{ and } y\in B\} \\
-\mbox{Star: } & A^\star  = \{x_1x_2\ldots x_k \mid  k\geq 0 \mbox{ and each } x_i\in A\} \\
-\end{align} %]]></script></p>
-
-<p>內嵌 LaTex</p>
-<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class=""><span class="line">If $a^2=b$ and $b=2$, then the solution must be
-</span><span class="line">either $a=+\sqrt{2}$ or $a=-\sqrt{2}$.</span></code></pre></td></tr></table></div></figure>
-<p>If $a^2=b$ and $b=2$, then the solution must be
-either $a=+\sqrt{2}$ or $a=-\sqrt{2}$.</p>
-
-<h2 id="section-3">四.參考資料</h2>
-<ul>
-  <li><a href="http://itspg.logdown.com/posts/1701-octopress-on-windows-tutorial">1.http://itspg.logdown.com/posts/1701-octopress-on-windows-tutorial</a></li>
-  <li><a href="http://www.yebangyu.org/blog/2015/10/17/howtoinstalloctopress/">2.http://www.yebangyu.org/blog/2015/10/17/howtoinstalloctopress/</a></li>
-  <li><a href="https://amos-vwr.blogspot.tw/2013/01/octopress-github.html">3.https://amos-vwr.blogspot.tw/2013/01/octopress-github.html</a></li>
-  <li><a href="http://dreamrunner.org/blog/2014/03/09/octopresszhong-shi-yong-latexxie-shu-xue-gong-shi/">4.http://dreamrunner.org/blog/2014/03/09/octopresszhong-shi-yong-latexxie-shu-xue-gong-shi/</a></li>
-</ul>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://darren1231.github.io/blog/2020/02/01/backpropagation/" data-via="" data-counturl="http://darren1231.github.io/blog/2020/02/01/backpropagation/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2020/01/19/this-is-the-title/" title="Previous Post: 在windows系統上用octopress打造自己的部落格">&laquo; 在windows系統上用octopress打造自己的部落格</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -876,6 +660,7 @@ either $a=+\sqrt{2}$ or $a=-\sqrt{2}$.</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -890,7 +675,10 @@ either $a=+\sqrt{2}$ or $a=-\sqrt{2}$.</p>
       var disqus_shortname = 'darren1231';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://darren1231.github.io/blog/2020/02/01/backpropagation/';
+        var disqus_url = 'http://darren1231.github.io/blog/2020/02/01/backpropagation/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
