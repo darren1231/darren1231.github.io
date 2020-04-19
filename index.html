@@ -9,7 +9,7 @@
   <meta name="author" content="Your Name">
 
   
-  <meta name="description" content="一.前言 小編看了很多的書籍介紹類神經的，發現這本講的最淺顯易懂而且還附有程式碼，我認為電腦科學與其他物理學、電磁學…等最不同的點在於他是可以看出效果的，是感覺的到的，就算不太懂他的數學原理，反覆地去看程式碼再回來對照公式很快就可以更深入的了解，但是類似電磁學那種理論， &hellip;">
+  <meta name="description" content="融合batchnorm 至conv中 最近在將模型轉換成嵌入式裝置可以使用的模型時，發現很多人都會將batchnorm層溶入到卷積層中做運算，剛開始看程式都看不太懂，後來查詢了一些資料再自己推導一次，發現是很簡單的數學運算，覺得很有趣，特地記錄下來學習學習~~ 公式運算: 原本的卷積核公式為 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +80,135 @@ MathJax.Hub.Config({
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/04/19/batchnorm2conv/">Batchnorm2conv</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-04-19T23:21:10+08:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>19</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>11:21 pm</span></time>
+        
+           | <a href="/blog/2020/04/19/batchnorm2conv/#disqus_thread"
+             data-disqus-identifier="http://darren1231.github.io/blog/2020/04/19/batchnorm2conv/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1 id="batchnorm-conv">融合batchnorm 至conv中</h1>
+
+<p>最近在將模型轉換成嵌入式裝置可以使用的模型時，發現很多人都會將batchnorm層溶入到卷積層中做運算，剛開始看程式都看不太懂，後來查詢了一些資料再自己推導一次，發現是很簡單的數學運算，覺得很有趣，特地記錄下來學習學習~~</p>
+
+<h2 id="section">公式運算:</h2>
+
+<p>原本的卷積核公式為</p>
+
+<p><img src="https://i.imgur.com/TqGySUA.png" alt="" /></p>
+
+<p>原本的batch_norm的公式為:</p>
+
+<p><img src="https://i.imgur.com/BS3sqH3.png" alt="" /></p>
+
+<p>如今要把batchnorm與卷積核融合成為同一個卷積核，也就是說要計算出一個新的權重w’與b’，如下列公式所示</p>
+
+<p><img src="https://i.imgur.com/bcjP84O.png" alt="" /></p>
+
+<p>再來就是公式推導了，首先將Z取代為wx+b然後代入</p>
+
+<p><img src="https://i.imgur.com/XSOTM2s.png" alt="" /></p>
+
+<p>之後移項推一推就可以得出下列式子</p>
+
+<p><img src="https://i.imgur.com/ZB1HY0y.png" alt="" /></p>
+
+<p>對照一下可以發現出新的w’與新的b’對照如下:</p>
+
+<p><img src="https://i.imgur.com/1heO534.png" alt="" /></p>
+
+<h2 id="caffe">程式碼實現(caffe)</h2>
+
+<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">## load weights
+</span><span class="line">mean = bn[0].data
+</span><span class="line">var = bn[1].data
+</span><span class="line">scalef = bn[2].data
+</span><span class="line">
+</span><span class="line"># process scale
+</span><span class="line">scales = scale[0].data
+</span><span class="line">shift = scale[1].data
+</span><span class="line">
+</span><span class="line">if scalef != 0:
+</span><span class="line">    scalef = 1. / scalef
+</span><span class="line">mean = mean * scalef
+</span><span class="line">var = var * scalef
+</span><span class="line">
+</span><span class="line">## process variance
+</span><span class="line">rstd = 1. / np.sqrt(var + 1e-5)
+</span><span class="line">                
+</span><span class="line">## caculate conv   
+</span><span class="line">rstd1 = rstd.reshape((channels,1,1,1))
+</span><span class="line">scales1 = scales.reshape((channels,1,1,1))
+</span><span class="line">wt = wt * rstd1 * scales1
+</span><span class="line">
+</span><span class="line">## caculate bias
+</span><span class="line">bias = (bias - mean) * rstd * scales + shift
+</span><span class="line">
+</span><span class="line">
+</span><span class="line">## set nobn weights and bias
+</span><span class="line">nobn.params[key][0].data[...] = wt
+</span><span class="line">nobn.params[key][1].data[...] = bias</span></code></pre></td></tr></table></div></figure>
+
+<h2 id="section-1">參考資料:</h2>
+<p>https://github.com/chuanqi305/MobileNet-SSD/blob/master/merge_bn.py
+https://www.itread01.com/content/1556626925.html
+https://stackoverflow.com/questions/49536856/tensorflow-how-to-merge-batchnorm-into-convolution-for-faster-inference
+https://ithelp.ithome.com.tw/articles/10225171</p>
+
+<h6 id="tags-learning-report">tags: <code>learning report</code></h6>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -857,6 +986,10 @@ either $a=+\sqrt{2}$ or $a=-\sqrt{2}$.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/04/19/batchnorm2conv/">Batchnorm2conv</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2020/02/01/backpropagation/">類神經網路筆記</a>
