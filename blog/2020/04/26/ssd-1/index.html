@@ -167,7 +167,7 @@ YOLO:</p>
 </span><span class="line">end_points['block5'] = net
 </span><span class="line">net = slim.max_pool2d(net, [3, 3], 1, scope='pool5')#max pool</span></code></pre></td></tr></table></div></figure>
 
-<p>下圖將第四個Detector拆開來，以便了解內部構造，如圖所示，輸入是個5X5X256的卷積特徵圖，而輸出是兩個卷積層，一個輸出形狀為5X5X12，用來預測每個box的四個座標，而每個位置可以自由地設定要幾個default box，像這例子就代表每個位置有三個不同比例的default box，因此輸出設計成12(3<em>4)，另一個輸出形狀為5X5X63，代表每個default box需要21個分類，因此輸出設計成63(C</em>3)，在這裡C為21(其中一類為背景類，因此在這裡的分類有20種)。</p>
+<p>下圖將第四個Detector拆開來，以便了解內部構造，如圖所示，輸入是個5X5X256的卷積特徵圖，而輸出是兩個卷積層，一個輸出形狀為5X5X12，用來預測每個box的四個座標，而每個位置可以自由地設定要幾個default box，像這例子就代表每個位置有三個不同比例的default box，因此輸出設計成12(3X4)，另一個輸出形狀為5X5X63，代表每個default box需要21個分類，因此輸出設計成63(CX3)，在這裡C為21(其中一類為背景類，因此在這裡的分類有20種)。</p>
 
 <p><img src="https://i.imgur.com/OpT13zi.png" alt="" /></p>
 
