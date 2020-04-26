@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://darren1231.github.io/blog/2020/04/26/ssd-1/</loc>
+<lastmod>2020-04-26T11:50:30+08:00</lastmod>
+</url>
+<url>
 <loc>http://darren1231.github.io/blog/2020/04/19/batchnorm2conv/</loc>
 <lastmod>2020-04-19T23:21:10+08:00</lastmod>
 </url>
