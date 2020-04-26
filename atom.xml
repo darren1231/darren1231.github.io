@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://darren1231.github.io/atom.xml" rel="self"/>
   <link href="http://darren1231.github.io/"/>
-  <updated>2020-04-26T12:23:51+08:00</updated>
+  <updated>2020-04-26T12:58:22+08:00</updated>
   <id>http://darren1231.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -83,15 +83,15 @@ YOLO:</p>
 </span><span class="line">end_points['block5'] = net
 </span><span class="line">net = slim.max_pool2d(net, [3, 3], 1, scope='pool5')#max pool</span></code></pre></td></tr></table></div></figure>
 
-<p>下圖將第四個Detector拆開來，以便了解內部構造，如圖所示，輸入是個5X5X256的卷積特徵圖，而輸出是5X5X75的卷積特徵圖，這個75是需特殊設置過的，必須符合(C+4)的倍數，C代表分類的總數，4代表預測box的四個值，在這裡C為21(其中一類為背景類，因此在這裡的分類有20種)。</p>
+<p>下圖將第四個Detector拆開來，以便了解內部構造，如圖所示，輸入是個5X5X256的卷積特徵圖，而輸出是兩個卷積層，一個輸出形狀為5X5X12，用來預測每個box的四個座標，而每個位置可以自由地設定要幾個default box，像這例子就代表每個位置有三個不同比例的default box，因此輸出設計成12(3<em>4)，另一個輸出形狀為5X5X63，代表每個default box需要21個分類，因此輸出設計成63(C</em>3)，在這裡C為21(其中一類為背景類，因此在這裡的分類有20種)。</p>
 
 <p><img src="https://i.imgur.com/OpT13zi.png" alt="" /></p>
 
-<p>同時，75也代表示卷積特徵圖5X5=25的倍數(n)，這個範例中n=3，代表每一個小方塊的周圍產生三個defaut box(藍紅綠框框)來做預測</p>
+<p>每個feature map分成25個位置當作中心點擺3個default box，因此總共有75個default box出現在這層</p>
 
 <p><img src="https://i.imgur.com/VDeLk1R.png" alt="" /></p>
 
-<p>因此，可以再把12、63分成三份，如中間的紅色小框框所示，深度為4，每一層各存不同的資訊，分別是中心點的座標x,y，以及其寬和高w,h，右邊的小紅框框也是同樣的道理，分別是20種類別再加上一個背景類別</p>
+<p>box預測如中間的紅色小框框所示，深度為4，每一層各存不同的資訊，分別是中心點的座標x,y，以及其寬和高w,h，右邊的小紅框框也是同樣的道理，分別是20種類別再加上一個背景類別</p>
 
 <p><img src="https://i.imgur.com/Dh6eeX0.png" alt="" /></p>
 
