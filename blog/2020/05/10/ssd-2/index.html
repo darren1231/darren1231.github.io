@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>SSD(2) Bounding-Box Regression - My Octopress Blog</title>
+  <meta name="author" content="Your Name">
+
+  
+  <meta name="description" content="以往我們對神經網路的概念都只是侷限在於輸入一張圖片然後對輸出做分類的動作，就像圖左邊的概念圖一樣，假設輸入的這張圖片是貓，那麼就會根據設定給出對應的學習輸出，在學術上我們稱作label，那麼未來在給定一張網路未曾見過的圖片時，若第一顆神經元的輸出數字很大，代表網路判定這張圖片有很高的機率為貓， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://darren1231.github.io/blog/2020/05/10/ssd-2/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">My Octopress Blog</a></h1>
+  
+    <h2>A blogging framework for hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="darren1231.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">SSD(2) Bounding-Box Regression</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-05-10T22:19:22+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>10:19 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://darren1231.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>以往我們對神經網路的概念都只是侷限在於輸入一張圖片然後對輸出做分類的動作，就像圖左邊的概念圖一樣，假設輸入的這張圖片是貓，那麼就會根據設定給出對應的學習輸出，在學術上我們稱作label，那麼未來在給定一張網路未曾見過的圖片時，若第一顆神經元的輸出數字很大，代表網路判定這張圖片有很高的機率為貓，這就是傳統的分類機器學習，學術上稱做classification。隨著研究的不斷發展，科學家們發現網路不單單只能做分類，還能做到更進階的物件定位，即在圖上把對應的物件以一個矩形框出對應的位置，學術上稱作localization，那麼學習的輸出應該給定什麼呢?很簡單，定義一個矩形就只要四個參數就可以決定了，分別是物件座標中心(X,Y)、物件的寬(W)、物件的高(H)，但是一張圖的物件數量是未知的，若我們很確定未來預測的每張圖片都只有兩個物件，那麼輸出就只要設定成8顆神經元即可</p>
+
+<p><img src="https://i.imgur.com/i8qhp3Q.png" alt="" /></p>
+
+<p>但實際情況可不是這樣，每張圖片的物件數量不定，怎麼解決這個問題呢?科學家想出一個很棒的辦法，即利用特定設計的default box來做回歸學習，學術上也稱作anchor，假設anchor的位置和物件真實的位置(ground truth)很接近，那麼就會把學習偵測此物件的工作交由給此anchor學習，如此的動作在學術上稱做Bounding-Box regression</p>
+
+<p><img src="https://i.imgur.com/E8QtCfA.png" alt="" /></p>
+
+<p>既然要把某個真實物件的座標(ground truth)交由特定的anchor學習，聰明的科學家們就設定出一套定義兩者之間的轉換公式，讓網路學習並定出相對定的label，在學術上稱做encode，而對於已經學習好的網路，拿到輸出並解析出在圖上真正位置稱為decode</p>
+
+<h2 id="encode">encode</h2>
+<p>論文上的encode 公式定義如下</p>
+
+<p><img src="https://i.imgur.com/IWl2pYy.png" alt="" /></p>
+
+<p>底下是各個參數對應名稱:</p>
+
+<p>$cx$:代表物體中心的x座標</p>
+
+<p>$g$:代表ground truth box</p>
+
+<p>$d$:代表defaut box</p>
+
+<p>$i$:是default box的索引</p>
+
+<p>$j$:是ground truth box的索引</p>
+
+<p>$\hat g^{cx}_j$:代表ground truth box中心點的x座標和defaut box中心點x座標相減並除以defaut box的寬</p>
+
+<p>$\hat g^{cy}_j$:代表ground truth box中心點的y座標和defaut box中心點y座標相減並除以defaut box的高</p>
+
+<p>$\hat g^{w}_j$:將ground truth box的寬除以defaut box的寬並取log</p>
+
+<p>$\hat g^{h}_j$:將ground truth box的高除以defaut box的高並取log</p>
+
+<p>$m$:是個集合，由四個元素組成，分別是cx,cy,w,h</p>
+
+<p>$l^m_i$:代表由網路預測出第i個defaut box的值</p>
+
+<p>別被複雜的公式嚇跑了，其實白話文來說就是:</p>
+
+<p>$\hat g^{cx}_j=$ (ground truth中心點座標X-anchor中心點座標X)/anchor的寬</p>
+
+<p>$\hat g^{cy}_j=$ (ground truth中心點座標Y-anchor中心點座標Y)/anchor的高</p>
+
+<p>$\hat g^{w}_j=$ log(ground truth的寬/anchor的寬)</p>
+
+<p>$\hat g^{h}_j=$ log(ground truth的高/anchor的高)</p>
+
+<p>因此，encode後的數字就是網路要學習的label，我們希望網路學習後的結果能夠和這label越接近越好</p>
+
+<p><img src="https://i.imgur.com/QZ2YapB.png" alt="" /></p>
+
+<p>而上述的圖片只是示意圖，代表只有一個anchor在學習，實際上使用會從各層抽出特徵圖出來，然後往後接出各層的anchor，因此會有數千個不等的anchor在學習，取決於網路的設置，像下圖所示的，每個點有3個anchor在學習，總共有25個點，因此這層的anchor總數就是75個</p>
+
+<p><img src="https://i.imgur.com/A420IIx.png" alt="" /></p>
+
+<p><a href="https://i.imgur.com/BJahNZK.png"></a></p>
+
+<p>而實際上訓練的時候還會把encode後的值再乘上某個參數，按照y、x、w、h的參數順序分別是[10.0, 10.0, 5.0, 5.0]，底下為encode完整程式碼</p>
+
+<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+</pre></td><td class="code"><pre><code class=""><span class="line"># https://github.com/tensorflow/models/blob/master/research/object_detection/box_coders/faster_rcnn_box_coder.py
+</span><span class="line">self._scale_factors = [10.0, 10.0, 5.0, 5.0]
+</span><span class="line">def _encode(self, boxes, anchors):
+</span><span class="line">    """Encode a box collection with respect to anchor collection.
+</span><span class="line">    Args:
+</span><span class="line">      boxes: BoxList holding N boxes to be encoded.
+</span><span class="line">      anchors: BoxList of anchors.
+</span><span class="line">    Returns:
+</span><span class="line">      a tensor representing N anchor-encoded boxes of the format
+</span><span class="line">      [ty, tx, th, tw].
+</span><span class="line">    """
+</span><span class="line">    # Convert anchors to the center coordinate representation.
+</span><span class="line">    ycenter_a, xcenter_a, ha, wa = anchors.get_center_coordinates_and_sizes()
+</span><span class="line">    ycenter, xcenter, h, w = boxes.get_center_coordinates_and_sizes()
+</span><span class="line">    # Avoid NaN in division and log below.
+</span><span class="line">    ha += EPSILON
+</span><span class="line">    wa += EPSILON
+</span><span class="line">    h += EPSILON
+</span><span class="line">    w += EPSILON
+</span><span class="line">
+</span><span class="line">    tx = (xcenter - xcenter_a) / wa
+</span><span class="line">    ty = (ycenter - ycenter_a) / ha
+</span><span class="line">    tw = tf.log(w / wa)
+</span><span class="line">    th = tf.log(h / ha)
+</span><span class="line">    # Scales location targets as used in paper for joint training.
+</span><span class="line">    if self._scale_factors:
+</span><span class="line">      ty *= self._scale_factors[0]
+</span><span class="line">      tx *= self._scale_factors[1]
+</span><span class="line">      th *= self._scale_factors[2]
+</span><span class="line">      tw *= self._scale_factors[3]
+</span><span class="line">    return tf.transpose(tf.stack([ty, tx, th, tw]))</span></code></pre></td></tr></table></div></figure>
+
+<h2 id="decode">decode</h2>
+<p>decode的公式即把公式回推，白話文解釋為</p>
+
+<p>ground truth中心點座標X = (anchor的寬 X 網路輸出中心點座標X)+anchor中心點座標X
+ground truth中心點座標Y = (anchor的高 X 網路輸出中心點座標Y)+anchor中心點座標Y
+ground truth的寬 =  e^(網路輸出的寬) X anchor的寬
+ground truth的高 = e^(網路輸出的高) X anchor的高</p>
+
+<p>由於encode的時候有乘上固定參數，因此decode的時候就必須要把參數除回來，因此，完整decode程式碼如下:</p>
+
+<figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class=""><span class="line"># https://github.com/tensorflow/models/blob/master/research/object_detection/box_coders/faster_rcnn_box_coder.py
+</span><span class="line">self._scale_factors = [10.0, 10.0, 5.0, 5.0]
+</span><span class="line">def _decode(self, rel_codes, anchors):
+</span><span class="line">    """Decode relative codes to boxes.
+</span><span class="line">    Args:
+</span><span class="line">      rel_codes: a tensor representing N anchor-encoded boxes.
+</span><span class="line">      anchors: BoxList of anchors.
+</span><span class="line">    Returns:
+</span><span class="line">      boxes: BoxList holding N bounding boxes.
+</span><span class="line">    """
+</span><span class="line">    ycenter_a, xcenter_a, ha, wa = anchors.get_center_coordinates_and_sizes()
+</span><span class="line">
+</span><span class="line">    ty, tx, th, tw = tf.unstack(tf.transpose(rel_codes))
+</span><span class="line">    if self._scale_factors:
+</span><span class="line">      ty /= self._scale_factors[0]
+</span><span class="line">      tx /= self._scale_factors[1]
+</span><span class="line">      th /= self._scale_factors[2]
+</span><span class="line">      tw /= self._scale_factors[3]
+</span><span class="line">    w = tf.exp(tw) * wa
+</span><span class="line">    h = tf.exp(th) * ha
+</span><span class="line">    ycenter = ty * ha + ycenter_a
+</span><span class="line">    xcenter = tx * wa + xcenter_a
+</span><span class="line">    ymin = ycenter - h / 2.
+</span><span class="line">    xmin = xcenter - w / 2.
+</span><span class="line">    ymax = ycenter + h / 2.
+</span><span class="line">    xmax = xcenter + w / 2.
+</span><span class="line">    return box_list.BoxList(tf.transpose(tf.stack([ymin, xmin, ymax, xmax])))</span></code></pre></td></tr></table></div></figure>
+
+<p>decode 完成後會在圖上出現大大小小的bounding box以及對應的分類分數，總數根據設計而定，但實際應用的時候不可能把全部的box都畫出來，我們會把分數較高的排在前面，分數低的排在後面，然後設定一個閥值，只把分數大於閥值的box畫出來，因此最後網路呈現的結果就會類似如下:</p>
+
+<p><img src="https://i.imgur.com/dgj2cjS.png" alt="" /></p>
+
+<p>最後再經由一個演算法，學術上稱做NMS(Non-Maximum Suppression)，就可以把一些重複性大的box濾掉，因此最後呈現的就是類似下面這張圖。這整個過程就稱為object detection，各位常看到的人臉定位就是object detection的其中一個應用</p>
+
+<p><img src="https://i.imgur.com/qWqnP0A.png" alt="" /></p>
+
+<p>參考資料:
+https://mingming97.github.io/2018/10/21/SSD/</p>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Your Name</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2020-05-10T22:19:22+08:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>10:19 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://darren1231.github.io/blog/2020/05/10/ssd-2/" data-via="" data-counturl="http://darren1231.github.io/blog/2020/05/10/ssd-2/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2020/04/26/ssd-1/" title="Previous Post: SSD(1):Single shot multibox detector">&laquo; SSD(1):Single shot multibox detector</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/05/10/ssd-2/">SSD(2) Bounding-Box Regression</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/04/26/ssd-1/">SSD(1):Single Shot Multibox Detector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/04/19/batchnorm2conv/">Batchnorm2conv</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/02/01/backpropagation/">類神經網路筆記</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2020/01/19/this-is-the-title/">在windows系統上用octopress打造自己的部落格</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - Your Name -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'darren1231';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://darren1231.github.io/blog/2020/05/10/ssd-2/';
+        var disqus_url = 'http://darren1231.github.io/blog/2020/05/10/ssd-2/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
