@@ -1,0 +1,159 @@
+---
+layout: post
+title: "SSD(2) Bounding-Box regression"
+date: 2020-05-10 22:19:22 +0800
+comments: true
+categories: 
+---
+
+以往我們對神經網路的概念都只是侷限在於輸入一張圖片然後對輸出做分類的動作，就像圖左邊的概念圖一樣，假設輸入的這張圖片是貓，那麼就會根據設定給出對應的學習輸出，在學術上我們稱作label，那麼未來在給定一張網路未曾見過的圖片時，若第一顆神經元的輸出數字很大，代表網路判定這張圖片有很高的機率為貓，這就是傳統的分類機器學習，學術上稱做classification。隨著研究的不斷發展，科學家們發現網路不單單只能做分類，還能做到更進階的物件定位，即在圖上把對應的物件以一個矩形框出對應的位置，學術上稱作localization，那麼學習的輸出應該給定什麼呢?很簡單，定義一個矩形就只要四個參數就可以決定了，分別是物件座標中心(X,Y)、物件的寬(W)、物件的高(H)，但是一張圖的物件數量是未知的，若我們很確定未來預測的每張圖片都只有兩個物件，那麼輸出就只要設定成8顆神經元即可
+
+![](https://i.imgur.com/i8qhp3Q.png)
+
+但實際情況可不是這樣，每張圖片的物件數量不定，怎麼解決這個問題呢?科學家想出一個很棒的辦法，即利用特定設計的default box來做回歸學習，學術上也稱作anchor，假設anchor的位置和物件真實的位置(ground truth)很接近，那麼就會把學習偵測此物件的工作交由給此anchor學習，如此的動作在學術上稱做Bounding-Box regression
+
+![](https://i.imgur.com/E8QtCfA.png)
+
+既然要把某個真實物件的座標(ground truth)交由特定的anchor學習，聰明的科學家們就設定出一套定義兩者之間的轉換公式，讓網路學習並定出相對定的label，在學術上稱做encode，而對於已經學習好的網路，拿到輸出並解析出在圖上真正位置稱為decode
+
+## encode
+論文上的encode 公式定義如下
+
+![](https://i.imgur.com/IWl2pYy.png)
+
+底下是各個參數對應名稱:
+
+$cx$:代表物體中心的x座標
+
+$g$:代表ground truth box
+
+$d$:代表defaut box
+
+$i$:是default box的索引
+
+$j$:是ground truth box的索引
+
+$\hat g^{cx}_j$:代表ground truth box中心點的x座標和defaut box中心點x座標相減並除以defaut box的寬
+
+$\hat g^{cy}_j$:代表ground truth box中心點的y座標和defaut box中心點y座標相減並除以defaut box的高
+
+$\hat g^{w}_j$:將ground truth box的寬除以defaut box的寬並取log
+
+$\hat g^{h}_j$:將ground truth box的高除以defaut box的高並取log
+
+$m$:是個集合，由四個元素組成，分別是cx,cy,w,h
+
+$l^m_i$:代表由網路預測出第i個defaut box的值
+
+別被複雜的公式嚇跑了，其實白話文來說就是:
+
+$\hat g^{cx}_j=$ (ground truth中心點座標X-anchor中心點座標X)/anchor的寬
+
+$\hat g^{cy}_j=$ (ground truth中心點座標Y-anchor中心點座標Y)/anchor的高
+
+$\hat g^{w}_j=$ log(ground truth的寬/anchor的寬)
+
+$\hat g^{h}_j=$ log(ground truth的高/anchor的高)
+
+因此，encode後的數字就是網路要學習的label，我們希望網路學習後的結果能夠和這label越接近越好
+
+![](https://i.imgur.com/QZ2YapB.png)
+
+而上述的圖片只是示意圖，代表只有一個anchor在學習，實際上使用會從各層抽出特徵圖出來，然後往後接出各層的anchor，因此會有數千個不等的anchor在學習，取決於網路的設置，像下圖所示的，每個點有3個anchor在學習，總共有25個點，因此這層的anchor總數就是75個
+
+![](https://i.imgur.com/A420IIx.png)
+
+[](https://i.imgur.com/BJahNZK.png)
+
+
+
+而實際上訓練的時候還會把encode後的值再乘上某個參數，按照y、x、w、h的參數順序分別是[10.0, 10.0, 5.0, 5.0]，底下為encode完整程式碼
+
+```
+# https://github.com/tensorflow/models/blob/master/research/object_detection/box_coders/faster_rcnn_box_coder.py
+self._scale_factors = [10.0, 10.0, 5.0, 5.0]
+def _encode(self, boxes, anchors):
+    """Encode a box collection with respect to anchor collection.
+    Args:
+      boxes: BoxList holding N boxes to be encoded.
+      anchors: BoxList of anchors.
+    Returns:
+      a tensor representing N anchor-encoded boxes of the format
+      [ty, tx, th, tw].
+    """
+    # Convert anchors to the center coordinate representation.
+    ycenter_a, xcenter_a, ha, wa = anchors.get_center_coordinates_and_sizes()
+    ycenter, xcenter, h, w = boxes.get_center_coordinates_and_sizes()
+    # Avoid NaN in division and log below.
+    ha += EPSILON
+    wa += EPSILON
+    h += EPSILON
+    w += EPSILON
+
+    tx = (xcenter - xcenter_a) / wa
+    ty = (ycenter - ycenter_a) / ha
+    tw = tf.log(w / wa)
+    th = tf.log(h / ha)
+    # Scales location targets as used in paper for joint training.
+    if self._scale_factors:
+      ty *= self._scale_factors[0]
+      tx *= self._scale_factors[1]
+      th *= self._scale_factors[2]
+      tw *= self._scale_factors[3]
+    return tf.transpose(tf.stack([ty, tx, th, tw]))
+```
+
+## decode
+decode的公式即把公式回推，白話文解釋為
+
+ground truth中心點座標X = (anchor的寬 X 網路輸出中心點座標X)+anchor中心點座標X
+
+ground truth中心點座標Y = (anchor的高 X 網路輸出中心點座標Y)+anchor中心點座標Y
+
+ground truth的寬 =  e^(網路輸出的寬) X anchor的寬
+
+ground truth的高 = e^(網路輸出的高) X anchor的高
+
+由於encode的時候有乘上固定參數，因此decode的時候就必須要把參數除回來，因此，完整decode程式碼如下:
+
+```
+# https://github.com/tensorflow/models/blob/master/research/object_detection/box_coders/faster_rcnn_box_coder.py
+self._scale_factors = [10.0, 10.0, 5.0, 5.0]
+def _decode(self, rel_codes, anchors):
+    """Decode relative codes to boxes.
+    Args:
+      rel_codes: a tensor representing N anchor-encoded boxes.
+      anchors: BoxList of anchors.
+    Returns:
+      boxes: BoxList holding N bounding boxes.
+    """
+    ycenter_a, xcenter_a, ha, wa = anchors.get_center_coordinates_and_sizes()
+
+    ty, tx, th, tw = tf.unstack(tf.transpose(rel_codes))
+    if self._scale_factors:
+      ty /= self._scale_factors[0]
+      tx /= self._scale_factors[1]
+      th /= self._scale_factors[2]
+      tw /= self._scale_factors[3]
+    w = tf.exp(tw) * wa
+    h = tf.exp(th) * ha
+    ycenter = ty * ha + ycenter_a
+    xcenter = tx * wa + xcenter_a
+    ymin = ycenter - h / 2.
+    xmin = xcenter - w / 2.
+    ymax = ycenter + h / 2.
+    xmax = xcenter + w / 2.
+    return box_list.BoxList(tf.transpose(tf.stack([ymin, xmin, ymax, xmax])))
+```
+
+decode 完成後會在圖上出現大大小小的bounding box以及對應的分類分數，總數根據設計而定，但實際應用的時候不可能把全部的box都畫出來，我們會把分數較高的排在前面，分數低的排在後面，然後設定一個閥值，只把分數大於閥值的box畫出來，因此最後網路呈現的結果就會類似如下:
+
+![](https://i.imgur.com/dgj2cjS.png)
+
+最後再經由一個演算法，學術上稱做NMS(Non-Maximum Suppression)，就可以把一些重複性大的box濾掉，因此最後呈現的就是類似下面這張圖。這整個過程就稱為object detection，各位常看到的人臉定位就是object detection的其中一個應用
+
+![](https://i.imgur.com/qWqnP0A.png)
+
+參考資料:
+https://mingming97.github.io/2018/10/21/SSD/
+

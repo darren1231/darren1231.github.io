@@ -1,0 +1,74 @@
+---
+layout: post
+title: "SSD(1):Single shot multibox detector"
+date: 2020-04-26 11:50:30 +0800
+comments: true
+categories: 
+---
+
+
+剛開始什麼都不太懂，直接就把論文載下來看，看完腦袋滿是問號，因為論文中很多概念都是繼承其他論文的研究，所以很多細節概念並沒有講得特別清晰，後來看到一個SSD教學的投影片，雖然全部內容都是俄文，但投影片的圖就足夠讓我們清楚的了解SSD的整個大架構原理，因此很多圖都是截自這個影片的。底下有附上這投影片的連結，有興趣的朋友可以點擊觀看
+
+
+[SSD: Single Shot MultiBox Detector (How it works)](https://www.youtube.com/watch?v=P8e-G-Mhx4k&t=3s)
+
+![](https://i.imgur.com/kUu8wpR.png)
+
+## abstract:
+SSD是當今最快的object detection算法，兼具了YOLO的速度與FasterRCNN的準度，本篇論文的最大特點是改進了YOLO只用最後一層來檢測目標而SSD運用多層feature map來做檢測，既兼顧大目標物體檢測亦提升小目標物體檢測的精度。本論文將YOLO在PASCAL VOC 2007 test的檢測精度由63.4%提升到74.3%，速度也從45FPS進展到59FPS(論文中闡述與圖中不同)，此外，如果採用512*512的大圖片訓練的話，精度甚至可高達81.6%。
+
+## Main:
+下面圖解說明YOLO與SSD的不同點:
+YOLO 是以最後一層全連接層來做box regression的動作，而SSD是結合各層的卷積網路來做box regression
+YOLO:
+
+![](https://i.imgur.com/xRLiOQP.png)
+
+SSD:
+本文以VGG當作基礎網路做了相關實驗，實際上SSD可以接在任何現有的網路後面，如下圖所示的，它是很多Detector組成的卷積網路
+
+![](https://i.imgur.com/q1iet4G.png)
+
+底下附上程式原始碼方便比較，原始碼來源如下:
+[Tensorflow-SSD code](https://github.com/balancap/SSD-Tensorflow)
+
+
+```
+# Original VGG-16 blocks.
+net = slim.repeat(inputs, 2, slim.conv2d, 64, [3, 3], scope='conv1')
+end_points['block1'] = net
+net = slim.max_pool2d(net, [2, 2], scope='pool1')
+# Block 2.
+net = slim.repeat(net, 2, slim.conv2d, 128, [3, 3], scope='conv2')
+end_points['block2'] = net
+net = slim.max_pool2d(net, [2, 2], scope='pool2')
+# Block 3.
+net = slim.repeat(net, 3, slim.conv2d, 256, [3, 3], scope='conv3')
+end_points['block3'] = net
+net = slim.max_pool2d(net, [2, 2], scope='pool3')
+# Block 4.
+net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv4')
+end_points['block4'] = net
+net = slim.max_pool2d(net, [2, 2], scope='pool4')
+# Block 5.
+net = slim.repeat(net, 3, slim.conv2d, 512, [3, 3], scope='conv5')
+end_points['block5'] = net
+net = slim.max_pool2d(net, [3, 3], 1, scope='pool5')#max pool
+```
+
+
+下圖將第四個Detector拆開來，以便了解內部構造，如圖所示，輸入是個5X5X256的卷積特徵圖，而輸出是兩個卷積層，一個輸出形狀為5X5X12，用來預測每個box的四個座標，而每個位置可以自由地設定要幾個default box，像這例子就代表每個位置有三個不同比例的default box，因此輸出設計成12(3X4)，另一個輸出形狀為5X5X63，代表每個default box需要21個分類，因此輸出設計成63(CX3)，在這裡C為21(其中一類為背景類，因此在這裡的分類有20種)。
+
+![](https://i.imgur.com/OpT13zi.png)
+
+每個feature map分成25個位置當作中心點擺3個default box，因此總共有75個default box出現在這層
+
+![](https://i.imgur.com/VDeLk1R.png)
+
+box預測如中間的紅色小框框所示，深度為4，每一層各存不同的資訊，分別是中心點的座標x,y，以及其寬和高w,h，右邊的小紅框框也是同樣的道理，分別是20種類別再加上一個背景類別
+
+![](https://i.imgur.com/Dh6eeX0.png)
+
+每一層的default box皆不同，將所有box集合起來就可以得到7308個default box
+
+![](https://i.imgur.com/wPRiIAO.png)
