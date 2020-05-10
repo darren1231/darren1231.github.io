@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://darren1231.github.io/atom.xml" rel="self"/>
   <link href="http://darren1231.github.io/"/>
-  <updated>2020-05-10T22:34:59+08:00</updated>
+  <updated>2020-05-10T22:38:42+08:00</updated>
   <id>http://darren1231.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -145,10 +145,13 @@
 <h2 id="decode">decode</h2>
 <p>decode的公式即把公式回推，白話文解釋為</p>
 
-<p>ground truth中心點座標X = (anchor的寬 X 網路輸出中心點座標X)+anchor中心點座標X
-ground truth中心點座標Y = (anchor的高 X 網路輸出中心點座標Y)+anchor中心點座標Y
-ground truth的寬 =  e^(網路輸出的寬) X anchor的寬
-ground truth的高 = e^(網路輸出的高) X anchor的高</p>
+<p>ground truth中心點座標X = (anchor的寬 X 網路輸出中心點座標X)+anchor中心點座標X</p>
+
+<p>ground truth中心點座標Y = (anchor的高 X 網路輸出中心點座標Y)+anchor中心點座標Y</p>
+
+<p>ground truth的寬 =  e^(網路輸出的寬) X anchor的寬</p>
+
+<p>ground truth的高 = e^(網路輸出的高) X anchor的高</p>
 
 <p>由於encode的時候有乘上固定參數，因此decode的時候就必須要把參數除回來，因此，完整decode程式碼如下:</p>
 
